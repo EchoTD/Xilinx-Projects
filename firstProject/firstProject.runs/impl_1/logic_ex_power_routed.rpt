@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version     : Vivado v.2022.2 (lin64) Build 3671981 Fri Oct 14 04:59:54 MDT 2022
-| Date             : Wed Oct 23 11:31:38 2024
+| Date             : Tue Oct 29 19:57:46 2024
 | Host             : echo-x250 running 64-bit Arch Linux
 | Command          : report_power -file logic_ex_power_routed.rpt -pb logic_ex_power_summary_routed.pb -rpx logic_ex_power_routed.rpx
 | Design           : logic_ex
@@ -30,14 +30,14 @@ Table of Contents
 ----------
 
 +--------------------------+--------------+
-| Total On-Chip Power (W)  | 0.839        |
+| Total On-Chip Power (W)  | 3.521        |
 | Design Power Budget (W)  | Unspecified* |
 | Power Budget Margin (W)  | NA           |
-| Dynamic (W)              | 0.740        |
-| Device Static (W)        | 0.100        |
+| Dynamic (W)              | 3.409        |
+| Device Static (W)        | 0.112        |
 | Effective TJA (C/W)      | 4.6          |
-| Max Ambient (C)          | 81.2         |
-| Junction Temperature (C) | 28.8         |
+| Max Ambient (C)          | 68.9         |
+| Junction Temperature (C) | 41.1         |
 | Confidence Level         | Low          |
 | Setting File             | ---          |
 | Simulation Activity File | ---          |
@@ -52,12 +52,12 @@ Table of Contents
 +----------------+-----------+----------+-----------+-----------------+
 | On-Chip        | Power (W) | Used     | Available | Utilization (%) |
 +----------------+-----------+----------+-----------+-----------------+
-| Slice Logic    |     0.001 |        1 |       --- |             --- |
-|   LUT as Logic |     0.001 |        1 |     63400 |           <0.01 |
-| Signals        |     0.006 |        2 |       --- |             --- |
-| I/O            |     0.733 |        2 |       210 |            0.95 |
-| Static Power   |     0.100 |          |           |                 |
-| Total          |     0.839 |          |           |                 |
+| Slice Logic    |     0.006 |        4 |       --- |             --- |
+|   LUT as Logic |     0.006 |        2 |     63400 |           <0.01 |
+| Signals        |     0.025 |        6 |       --- |             --- |
+| I/O            |     3.378 |        6 |       210 |            2.86 |
+| Static Power   |     0.112 |          |           |                 |
+| Total          |     3.521 |          |           |                 |
 +----------------+-----------+----------+-----------+-----------------+
 
 
@@ -67,9 +67,9 @@ Table of Contents
 +-----------+-------------+-----------+-------------+------------+-------------+-------------+------------+
 | Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) | Powerup (A) | Budget (A)  | Margin (A) |
 +-----------+-------------+-----------+-------------+------------+-------------+-------------+------------+
-| Vccint    |       1.000 |     0.028 |       0.011 |      0.017 |       NA    | Unspecified | NA         |
-| Vccaux    |       1.800 |     0.045 |       0.027 |      0.018 |       NA    | Unspecified | NA         |
-| Vcco33    |       3.300 |     0.210 |       0.206 |      0.004 |       NA    | Unspecified | NA         |
+| Vccint    |       1.000 |     0.066 |       0.039 |      0.028 |       NA    | Unspecified | NA         |
+| Vccaux    |       1.800 |     0.143 |       0.123 |      0.019 |       NA    | Unspecified | NA         |
+| Vcco33    |       3.300 |     0.958 |       0.954 |      0.004 |       NA    | Unspecified | NA         |
 | Vcco25    |       2.500 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
 | Vcco18    |       1.800 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
 | Vcco15    |       1.500 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
@@ -134,7 +134,7 @@ Table of Contents
 +----------+-----------+
 | Name     | Power (W) |
 +----------+-----------+
-| logic_ex |     0.740 |
+| logic_ex |     3.409 |
 +----------+-----------+
 
 

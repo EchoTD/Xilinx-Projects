@@ -70,10 +70,6 @@ proc create_report { reportName command } {
   }
 }
 OPTRACE "synth_1" START { ROLLUP_AUTO }
-set_param checkpoint.writeSynthRtdsInDcp 1
-set_param synth.incrementalSynthesisCache /tmp/.Xil_acg/Vivado-1453-echo-x250/incrSyn
-set_msg_config -id {Synth 8-256} -limit 10000
-set_msg_config -id {Synth 8-638} -limit 10000
 OPTRACE "Creating in-memory project" START { }
 create_project -in_memory -part xc7a100tcsg324-2
 
@@ -88,7 +84,7 @@ set_property ip_output_repo {/home/acg/Desktop/Xilinx Projects/firstProject/firs
 set_property ip_cache_permissions {read write} [current_project]
 OPTRACE "Creating in-memory project" END { }
 OPTRACE "Adding files" START { }
-read_vhdl -library xil_defaultlib {{/home/acg/Desktop/Xilinx Projects/firstProject/firstProject.srcs/sources_1/new/example.vhd}}
+read_vhdl -library xil_defaultlib {{/home/acg/Desktop/Xilinx Projects/firstProject/firstProject.srcs/sources_1/new/hw1.vhd}}
 OPTRACE "Adding files" END { }
 # Mark all dcp files as not used in implementation to prevent them from being
 # stitched into the results of this synthesis run. Any black boxes in the
@@ -102,6 +98,8 @@ read_xdc {{/home/acg/Desktop/Xilinx Projects/firstProject/firstProject.srcs/cons
 set_property used_in_implementation false [get_files {{/home/acg/Desktop/Xilinx Projects/firstProject/firstProject.srcs/constrs_1/new/Nexys-A7-100T-Master.xdc}}]
 
 set_param ips.enableIPCacheLiteLoad 1
+
+read_checkpoint -auto_incremental -incremental {/home/acg/Desktop/Xilinx Projects/firstProject/firstProject.srcs/utils_1/imports/synth_1/logic_ex.dcp}
 close [open __synthesis_is_running__ w]
 
 OPTRACE "synth_design" START { }
