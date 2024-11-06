@@ -1,0 +1,13 @@
+#-----------------------------------------------------------
+# Vivado v2022.2 (64-bit)
+# SW Build 3671981 on Fri Oct 14 04:59:54 MDT 2022
+# IP Build 3669848 on Fri Oct 14 08:30:02 MDT 2022
+# Start of session at: Tue Nov  5 21:37:45 2024
+# Process ID: 29304
+# Current directory: /home/acg/Desktop/Xilinx Projects/homework_1_8bitAdder/homework_1_8bitAdder.runs/impl_1
+# Command line: vivado -log eightBitAdder.vdi -applog -product Vivado -messageDb vivado.pb -mode batch -source eightBitAdder.tcl -notrace
+# Log file: /home/acg/Desktop/Xilinx Projects/homework_1_8bitAdder/homework_1_8bitAdder.runs/impl_1/eightBitAdder.vdi
+# Journal file: /home/acg/Desktop/Xilinx Projects/homework_1_8bitAdder/homework_1_8bitAdder.runs/impl_1/vivado.jou
+# Running On: echo-x250, OS: Linux, CPU Frequency: 2611.244 MHz, CPU Physical cores: 2, Host memory: 8197 MB
+#-----------------------------------------------------------
+source eightBitAdder.tcl -notrace

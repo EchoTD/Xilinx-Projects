@@ -1,0 +1,1 @@
+--incr --debug "typical" --relax --mt "8" -L "xil_defaultlib" -L "secureip" --snapshot "eightBitAdder_tb_behav" "xil_defaultlib.eightBitAdder_tb" -log "elaborate.log" 

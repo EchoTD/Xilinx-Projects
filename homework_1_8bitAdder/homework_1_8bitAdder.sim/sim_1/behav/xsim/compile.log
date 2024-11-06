@@ -1,0 +1,2 @@
+INFO: [VRFC 10-163] Analyzing VHDL file "/home/acg/Desktop/Xilinx Projects/homework_1_8bitAdder/homework_1_8bitAdder.srcs/sim_1/new/tb_eightBitAdder.vhd" into library xil_defaultlib
+INFO: [VRFC 10-3107] analyzing entity 'eightBitAdder_tb'
