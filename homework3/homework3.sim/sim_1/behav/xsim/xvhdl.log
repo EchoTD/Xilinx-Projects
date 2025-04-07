@@ -1,0 +1,4 @@
+INFO: [VRFC 10-163] Analyzing VHDL file "/home/acg/Desktop/Xilinx Projects/homework3/homework3.srcs/sources_1/new/sevenSegmentSystem.vhd" into library xil_defaultlib
+INFO: [VRFC 10-3107] analyzing entity 'seven_seg_fsm'
+INFO: [VRFC 10-163] Analyzing VHDL file "/home/acg/Desktop/Xilinx Projects/homework3/homework3.srcs/sim_1/new/tb_sevenSegmentSystem.vhd" into library xil_defaultlib
+INFO: [VRFC 10-3107] analyzing entity 'tb_seven_seg_fsm'

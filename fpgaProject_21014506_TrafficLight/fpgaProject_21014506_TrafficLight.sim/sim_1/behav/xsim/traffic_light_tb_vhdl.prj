@@ -1,0 +1,7 @@
+# compile vhdl design source files
+vhdl xil_defaultlib  \
+"../../../../fpgaProject_21014506_TrafficLight.srcs/sources_1/new/traffic_light_top.vhd" \
+"../../../../fpgaProject_21014506_TrafficLight.srcs/sim_1/new/traffic_light_tb.vhd" \
+
+# Do not sort compile order
+nosort

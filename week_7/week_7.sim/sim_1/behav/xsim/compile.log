@@ -1,0 +1,4 @@
+INFO: [VRFC 10-163] Analyzing VHDL file "/home/acg/Desktop/Xilinx Projects/week_7/week_7.srcs/sources_1/new/main.vhd" into library xil_defaultlib
+INFO: [VRFC 10-3107] analyzing entity 'main'
+INFO: [VRFC 10-163] Analyzing VHDL file "/home/acg/Desktop/Xilinx Projects/week_7/week_7.srcs/sim_1/new/tb_main.vhd" into library xil_defaultlib
+INFO: [VRFC 10-3107] analyzing entity 'main_tb'

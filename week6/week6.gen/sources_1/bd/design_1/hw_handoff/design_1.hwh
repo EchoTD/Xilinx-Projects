@@ -1,0 +1,122 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Wed Nov  6 09:52:43 2024" VIVADOVERSION="2022.2">
+
+  <SYSTEMINFO ARCH="artix7" DEVICE="7a100t" NAME="design_1" PACKAGE="csg324" SPEEDGRADE="-2"/>
+
+  <EXTERNALPORTS>
+    <PORT DIR="O" NAME="xOut_0" SIGIS="undef" SIGNAME="week6_2_xOut">
+      <CONNECTIONS>
+        <CONNECTION INSTANCE="week6_2" PORT="xOut"/>
+      </CONNECTIONS>
+    </PORT>
+    <PORT DIR="I" NAME="x1_0" SIGIS="undef" SIGNAME="External_Ports_x1_0">
+      <CONNECTIONS>
+        <CONNECTION INSTANCE="week6_0" PORT="x1"/>
+      </CONNECTIONS>
+    </PORT>
+    <PORT DIR="I" NAME="x2_0" SIGIS="undef" SIGNAME="External_Ports_x2_0">
+      <CONNECTIONS>
+        <CONNECTION INSTANCE="week6_1" PORT="x2"/>
+      </CONNECTIONS>
+    </PORT>
+  </EXTERNALPORTS>
+
+  <EXTERNALINTERFACES/>
+
+  <MODULES>
+    <MODULE COREREVISION="1" FULLNAME="/week6_0" HWVERSION="1.0" INSTANCE="week6_0" IPTYPE="PERIPHERAL" IS_ENABLE="1" MODCLASS="PERIPHERAL" MODTYPE="week6" VLNV="xilinx.com:module_ref:week6:1.0">
+      <DOCUMENTS/>
+      <PARAMETERS>
+        <PARAMETER NAME="Component_Name" VALUE="design_1_week6_0_0"/>
+        <PARAMETER NAME="EDK_IPTYPE" VALUE="PERIPHERAL"/>
+      </PARAMETERS>
+      <PORTS>
+        <PORT DIR="I" NAME="x1" SIGIS="undef" SIGNAME="External_Ports_x1_0">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="External_Ports" PORT="x1_0"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="I" NAME="x2" SIGIS="undef" SIGNAME="xlconstant_0_dout">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="xlconstant_0" PORT="dout"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="O" NAME="xOut" SIGIS="undef" SIGNAME="week6_0_xOut">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="week6_2" PORT="x1"/>
+          </CONNECTIONS>
+        </PORT>
+      </PORTS>
+      <BUSINTERFACES/>
+    </MODULE>
+    <MODULE COREREVISION="1" FULLNAME="/week6_1" HWVERSION="1.0" INSTANCE="week6_1" IPTYPE="PERIPHERAL" IS_ENABLE="1" MODCLASS="PERIPHERAL" MODTYPE="week6" VLNV="xilinx.com:module_ref:week6:1.0">
+      <DOCUMENTS/>
+      <PARAMETERS>
+        <PARAMETER NAME="Component_Name" VALUE="design_1_week6_0_1"/>
+        <PARAMETER NAME="EDK_IPTYPE" VALUE="PERIPHERAL"/>
+      </PARAMETERS>
+      <PORTS>
+        <PORT DIR="I" NAME="x1" SIGIS="undef" SIGNAME="xlconstant_0_dout">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="xlconstant_0" PORT="dout"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="I" NAME="x2" SIGIS="undef" SIGNAME="External_Ports_x2_0">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="External_Ports" PORT="x2_0"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="O" NAME="xOut" SIGIS="undef" SIGNAME="week6_1_xOut">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="week6_2" PORT="x2"/>
+          </CONNECTIONS>
+        </PORT>
+      </PORTS>
+      <BUSINTERFACES/>
+    </MODULE>
+    <MODULE COREREVISION="1" FULLNAME="/week6_2" HWVERSION="1.0" INSTANCE="week6_2" IPTYPE="PERIPHERAL" IS_ENABLE="1" MODCLASS="PERIPHERAL" MODTYPE="week6" VLNV="xilinx.com:module_ref:week6:1.0">
+      <DOCUMENTS/>
+      <PARAMETERS>
+        <PARAMETER NAME="Component_Name" VALUE="design_1_week6_0_2"/>
+        <PARAMETER NAME="EDK_IPTYPE" VALUE="PERIPHERAL"/>
+      </PARAMETERS>
+      <PORTS>
+        <PORT DIR="I" NAME="x1" SIGIS="undef" SIGNAME="week6_0_xOut">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="week6_0" PORT="xOut"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="I" NAME="x2" SIGIS="undef" SIGNAME="week6_1_xOut">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="week6_1" PORT="xOut"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="O" NAME="xOut" SIGIS="undef" SIGNAME="week6_2_xOut">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="External_Ports" PORT="xOut_0"/>
+          </CONNECTIONS>
+        </PORT>
+      </PORTS>
+      <BUSINTERFACES/>
+    </MODULE>
+    <MODULE COREREVISION="7" FULLNAME="/xlconstant_0" HWVERSION="1.1" INSTANCE="xlconstant_0" IPTYPE="PERIPHERAL" IS_ENABLE="1" MODCLASS="PERIPHERAL" MODTYPE="xlconstant" VLNV="xilinx.com:ip:xlconstant:1.1">
+      <DOCUMENTS/>
+      <PARAMETERS>
+        <PARAMETER NAME="CONST_WIDTH" VALUE="1"/>
+        <PARAMETER NAME="CONST_VAL" VALUE="0x1"/>
+        <PARAMETER NAME="Component_Name" VALUE="design_1_xlconstant_0_0"/>
+        <PARAMETER NAME="EDK_IPTYPE" VALUE="PERIPHERAL"/>
+      </PARAMETERS>
+      <PORTS>
+        <PORT DIR="O" LEFT="0" NAME="dout" RIGHT="0" SIGIS="undef" SIGNAME="xlconstant_0_dout">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="week6_0" PORT="x2"/>
+            <CONNECTION INSTANCE="week6_1" PORT="x1"/>
+          </CONNECTIONS>
+        </PORT>
+      </PORTS>
+      <BUSINTERFACES/>
+    </MODULE>
+  </MODULES>
+
+</EDKSYSTEM>

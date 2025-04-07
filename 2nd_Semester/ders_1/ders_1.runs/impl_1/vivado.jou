@@ -1,0 +1,13 @@
+#-----------------------------------------------------------
+# Vivado v2022.2 (64-bit)
+# SW Build 3671981 on Fri Oct 14 04:59:54 MDT 2022
+# IP Build 3669848 on Fri Oct 14 08:30:02 MDT 2022
+# Start of session at: Mon Mar 10 15:46:17 2025
+# Process ID: 22008
+# Current directory: /home/acg/Desktop/Xilinx Projects/2nd_Semester/ders_1/ders_1.runs/impl_1
+# Command line: vivado -log top_module.vdi -applog -product Vivado -messageDb vivado.pb -mode batch -source top_module.tcl -notrace
+# Log file: /home/acg/Desktop/Xilinx Projects/2nd_Semester/ders_1/ders_1.runs/impl_1/top_module.vdi
+# Journal file: /home/acg/Desktop/Xilinx Projects/2nd_Semester/ders_1/ders_1.runs/impl_1/vivado.jou
+# Running On: echo-x250, OS: Linux, CPU Frequency: 2686.868 MHz, CPU Physical cores: 2, Host memory: 8194 MB
+#-----------------------------------------------------------
+source top_module.tcl -notrace
