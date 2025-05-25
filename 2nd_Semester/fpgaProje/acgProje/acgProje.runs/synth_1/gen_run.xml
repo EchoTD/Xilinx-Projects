@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<GenRun Id="synth_1" LaunchPart="xc7a100tcsg324-2" LaunchTime="1748198303">
-  <File Type="VDS-TIMINGSUMMARY" Name="top_module_timing_summary_synth.rpt"/>
-  <File Type="RDS-DCP" Name="top_module.dcp"/>
-  <File Type="RDS-UTIL-PB" Name="top_module_utilization_synth.pb"/>
-  <File Type="RDS-UTIL" Name="top_module_utilization_synth.rpt"/>
-  <File Type="VDS-TIMING-PB" Name="top_module_timing_summary_synth.pb"/>
-  <File Type="PA-TCL" Name="top_module.tcl"/>
-  <File Type="REPORTS-TCL" Name="top_module_reports.tcl"/>
-  <File Type="RDS-RDS" Name="top_module.vds"/>
-  <File Type="RDS-PROPCONSTRS" Name="top_module_drc_synth.rpt"/>
+<GenRun Id="synth_1" LaunchPart="xc7a100tcsg324-2" LaunchTime="1748198860">
+  <File Type="VDS-TIMINGSUMMARY" Name="top_timing_summary_synth.rpt"/>
+  <File Type="RDS-DCP" Name="top.dcp"/>
+  <File Type="RDS-UTIL-PB" Name="top_utilization_synth.pb"/>
+  <File Type="RDS-UTIL" Name="top_utilization_synth.rpt"/>
+  <File Type="RDS-PROPCONSTRS" Name="top_drc_synth.rpt"/>
+  <File Type="RDS-RDS" Name="top.vds"/>
+  <File Type="REPORTS-TCL" Name="top_reports.tcl"/>
+  <File Type="VDS-TIMING-PB" Name="top_timing_summary_synth.pb"/>
+  <File Type="PA-TCL" Name="top.tcl"/>
   <FileSet Name="sources" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1" RelGenDir="$PGENDIR/sources_1">
     <Filter Type="Srcs"/>
     <File Path="$PSRCDIR/sources_1/new/adxl_spi.vhd">
@@ -43,7 +43,7 @@
     </File>
     <Config>
       <Option Name="DesignMode" Val="RTL"/>
-      <Option Name="TopModule" Val="top_module"/>
+      <Option Name="TopModule" Val="top"/>
     </Config>
   </FileSet>
   <FileSet Name="constrs_in" Type="Constrs" RelSrcDir="$PSRCDIR/constrs_1">

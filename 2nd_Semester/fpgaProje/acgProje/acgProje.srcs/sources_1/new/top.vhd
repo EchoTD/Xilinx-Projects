@@ -1,77 +1,61 @@
---  top.vhd  -  minimal top (no seven-segment, no LEDs)
---  Vivado 2022.2 • Nexys-A7-100T • 100 MHz system clock
+--  top.vhd  •  Vivado 2022.2  •  Nexys-A7-100T
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 entity top is
-    generic (
-        g_clkfreq : integer := 100_000_000      -- on-board 100 MHz
-    );
+    generic ( CLK_FREQ : integer := 100_000_000 );
     port (
-        CLK100MHZ       : in  std_logic;
-        JA              : inout std_logic_vector(10 downto 1);
-        JD              : out   std_logic_vector(4 downto 1);
-        SW              : in  std_logic_vector(5 downto 0);
-        BTNC, BTNU, BTND: in  std_logic;
-        UART_RXD_OUT    : out std_logic
+        CLK100MHZ     : in  std_logic;
+        -- on-board ADXL345
+        ACL_MISO      : in  std_logic;
+        ACL_MOSI      : out std_logic;
+        ACL_SCLK      : out std_logic;
+        ACL_CSN       : out std_logic;
+        -- stepper coils  JD[4:1]
+        JD            : out std_logic_vector(4 downto 1);
+        -- user I/O
+        SW            : in  std_logic_vector(5 downto 0);
+        BTNC, BTNU,
+        BTND          : in  std_logic;
+        -- UART TX → PC
+        UART_RXD_OUT  : out std_logic
     );
 end top;
 
 architecture rtl of top is
-    signal spi_miso   : std_logic;
-    signal spi_mosi   : std_logic;
-    signal spi_sclk   : std_logic;
-    signal spi_cs     : std_logic;
-
+    -- accelerometer interface
     signal ax, ay, az : std_logic_vector(15 downto 0);
     signal acc_ready  : std_logic;
-
-
-    signal sm_start   : std_logic;
-    signal sm_dir     : std_logic;
-    signal sm_steps   : unsigned(15 downto 0);
-    signal sm_busy    : std_logic;
-
+    -- motor control
+    signal motor_en   : std_logic;
+    signal motor_dir  : std_logic;
     signal btnc_prev  : std_logic := '0';
-
-    signal uart_start : std_logic;
-    signal uart_busy  : std_logic;
-    signal uart_byte  : std_logic_vector(7 downto 0);
-
-    type buf_t is array(0 to 7) of std_logic_vector(7 downto 0);
-    signal tx_buf     : buf_t;
-    signal tx_index   : integer range 0 to 7 := 0;
-    signal tx_active  : std_logic := '0';
-    
+    -- UART
+    signal tx_buf     : std_logic_vector(7 downto 0);
+    signal tx_start   : std_logic;
+    signal tx_busy    : std_logic;
+    type fsm_t is (idle, send2, send3, send4, send5, send6, send7, lf);
+    signal fsm       : fsm_t := idle;
 begin
-
-    JA(1) <= 'Z';                       -- MISO line is input only
-    spi_miso <= JA(1);
-
-    JA(2) <= spi_mosi;
-    JA(3) <= spi_sclk;
-    JA(4) <= spi_cs;
-    
+    -------------------------------------------------------------------------
+    -- accelerometer SPI reader
     acc_reader_i : entity work.acc_reader
-        generic map (
-            c_clkfreq  => g_clkfreq,
-            c_sclkfreq => 1_000_000,
-            c_readfreq => 100,
-            c_cpol     => '0',
-            c_cpha     => '0')
+        generic map ( c_clkfreq => CLK_FREQ )
         port map (
-            clk_i   => CLK100MHZ,
-            miso_i  => spi_miso,
-            mosi_o  => spi_mosi,
-            sclk_o  => spi_sclk,
-            cs_o    => spi_cs,
-            ax_o    => ax,
-            ay_o    => ay,
-            az_o    => az,
-            ready_o => acc_ready);
+            clk_i  => CLK100MHZ,
+            miso_i => ACL_MISO,
+            mosi_o => ACL_MOSI,
+            sclk_o => ACL_SCLK,
+            cs_o   => ACL_CSN,
+            ax_o   => ax,
+            ay_o   => ay,
+            az_o   => az,
+            ready_o=> acc_ready);
 
-    process(CLK100MHZ)  -- one-clock pulse on btnc_rise
+    -------------------------------------------------------------------------
+    -- motor enable / direction
+    process(CLK100MHZ)
         variable btnc_rise : std_logic;
     begin
         if rising_edge(CLK100MHZ) then
@@ -79,79 +63,55 @@ begin
             btnc_prev <= BTNC;
 
             if SW(5) = '0' then
-                -- autopilot  - one burst every fresh sample
-                sm_start <= acc_ready;
-                sm_dir   <= ax(15);
-                if ax(15) = '1' then
-                    sm_steps <= unsigned(-signed(ax(15 downto 2)));
-                else
-                    sm_steps <= unsigned( signed(ax(15 downto 2)));
-                end if;
+                motor_en  <= acc_ready;
+                motor_dir <= ax(15);
             else
-
-                sm_start <= btnc_rise;
-                sm_dir   <= BTNU;               -- CW if BTNU, CCW if BTND
-                sm_steps <= ("0000" & unsigned(SW(4 downto 0))); --  0-31 steps
+                motor_en  <= btnc_rise;
+                motor_dir <= BTNU;
             end if;
         end if;
     end process;
 
-    step_motor_i : entity work.step_motor
-        generic map (
-            c_clkfreq => g_clkfreq)
+    -------------------------------------------------------------------------
+    -- stepper driver
+    stepdrv : entity work.pmod_step_driver
         port map (
-            clk      => CLK100MHZ,
-            start_i  => sm_start,
-            dir_i    => sm_dir,
-            steps_i  => sm_steps,
-            busy_o   => sm_busy,
-            coils_o  => JD(4 downto 1));
+            rst    => '0',
+            dir    => motor_dir,
+            clk    => CLK100MHZ,
+            en     => motor_en,
+            signal => JD(4 downto 1));
 
+    -------------------------------------------------------------------------
+    -- simple UART: A + raw XYZ + LF (8 bytes)
     process(CLK100MHZ)
     begin
         if rising_edge(CLK100MHZ) then
-            -- launch a fresh frame
-            if (acc_ready = '1') and (tx_active = '0') then
-                tx_buf(0) <= x"41";            -- 'A'
-                tx_buf(1) <= ax(15 downto 8);
-                tx_buf(2) <= ax(7 downto 0);
-                tx_buf(3) <= ay(15 downto 8);
-                tx_buf(4) <= ay(7 downto 0);
-                tx_buf(5) <= az(15 downto 8);
-                tx_buf(6) <= az(7 downto 0);
-                tx_buf(7) <= x"0A";            -- LF
-                tx_index  <= 0;
-                tx_active <= '1';
-            end if;
-
-            -- feed the UART whenever it is idle
-            if (tx_active = '1') and (uart_busy = '0') then
-                uart_byte  <= tx_buf(tx_index);
-                uart_start <= '1';
-            else
-                uart_start <= '0';
-            end if;
-
-            -- advance pointer once start pulse has been accepted
-            if uart_start = '1' then
-                if tx_index = 7 then
-                    tx_active <= '0';
-                else
-                    tx_index  <= tx_index + 1;
-                end if;
-            end if;
+            tx_start <= '0';
+            case fsm is
+                when idle =>
+                    if acc_ready = '1' then
+                        tx_buf   <= x"41";  -- 'A'
+                        tx_start <= '1';
+                        fsm      <= send2;
+                    end if;
+                when send2  => if tx_busy='0' then tx_buf<=ax(15 downto 8); tx_start<='1'; fsm<=send3; end if;
+                when send3  => if tx_busy='0' then tx_buf<=ax(7 downto 0);  tx_start<='1'; fsm<=send4; end if;
+                when send4  => if tx_busy='0' then tx_buf<=ay(15 downto 8); tx_start<='1'; fsm<=send5; end if;
+                when send5  => if tx_busy='0' then tx_buf<=ay(7 downto 0);  tx_start<='1'; fsm<=send6; end if;
+                when send6  => if tx_busy='0' then tx_buf<=az(15 downto 8); tx_start<='1'; fsm<=send7; end if;
+                when send7  => if tx_busy='0' then tx_buf<=az(7 downto 0);  tx_start<='1'; fsm<=lf;    end if;
+                when lf     => if tx_busy='0' then tx_buf<=x"0A";          tx_start<='1'; fsm<=idle;  end if;
+            end case;
         end if;
     end process;
 
-    -- UART transmitter (8-N-1, 115 200 baud)
     uart_tx_i : entity work.uart_tx
-        generic map (
-            c_clkfreq => g_clkfreq,
-            c_baud    => 115200)
+        generic map ( c_clkfreq => CLK_FREQ, c_baud => 115200 )
         port map (
             clk      => CLK100MHZ,
-            tx_start => uart_start,
-            tx_data  => uart_byte,
-            tx_busy  => uart_busy,
+            tx_start => tx_start,
+            tx_data  => tx_buf,
+            tx_busy  => tx_busy,
             txd_o    => UART_RXD_OUT);
 end rtl;

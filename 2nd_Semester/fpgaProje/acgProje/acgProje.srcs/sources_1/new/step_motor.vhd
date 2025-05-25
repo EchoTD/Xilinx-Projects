@@ -1,66 +1,118 @@
-library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
 
 entity step_motor is
-    generic (
-        c_clkfreq       : integer := 100_000_000;        -- Hz
-        c_max_rpm       : integer := 15;                 -- safety limit
-        c_steps_per_rev : integer := 2048                -- 28BYJ-48 in half-step
-    );
-    port (
-        clk            : in  std_logic;
-        start_i        : in  std_logic;                  -- pulse = execute
-        dir_i          : in  std_logic;                  -- '1' = CW, '0' = CCW
-        steps_i        : in  unsigned(15 downto 0);      -- how many half-steps
-        busy_o         : out std_logic;
-        coils_o        : out std_logic_vector(3 downto 0) -- map to JD[4:1]
-    );
+    Port (
+        rst    : in  STD_LOGIC;
+        dir    : in  STD_LOGIC;
+        clk    : in  STD_LOGIC;
+        en     : in  STD_LOGIC;
+        o_signal : out std_logic_vector(3 downto 0) 
+        );
 end step_motor;
 
-architecture rtl of step_motor is
-    type seq_t is array (0 to 7) of std_logic_vector(3 downto 0);
-    constant c_seq : seq_t :=
-        ("1000","1100","0100","0110","0010","0011","0001","1001");
-
-    constant c_tick_lim : integer :=
-        c_clkfreq / (c_max_rpm * c_steps_per_rev / 60);
-
-    signal tick_cnt  : integer range 0 to c_tick_lim := 0;
-    signal step_cnt  : unsigned(15 downto 0) := (others=>'0');
-    signal idx       : unsigned(2 downto 0) := (others=>'0');
-    signal active    : std_logic := '0';
+architecture Behavioral of step_motor is
+    -- Durum tanımları
+    type state_type is (sig0, sig1, sig2, sig3, sig4);
+    signal present_state, next_state : state_type := sig0;
+    
+    -- UART'tan gelen yön bilgisini kaydetmek için register
+    signal dir_reg : STD_LOGIC := '0';
 begin
-    coils_o <= c_seq(to_integer(idx));
-    busy_o  <= active;
 
+    -- Yön bilgisini kaydetme (clock ile senkronize)
     process(clk)
     begin
         if rising_edge(clk) then
-            if active = '0' then
-                if start_i = '1' and steps_i /= 0 then
-                    active   <= '1';
-                    step_cnt <= steps_i;
-                end if;
-            else
-                -- step-rate timer
-                if tick_cnt = c_tick_lim-1 then
-                    tick_cnt <= 0;
-                    -- advance sequence
-                    if dir_i = '1' then
-                        idx <= idx + 1;
-                    else
-                        idx <= idx - 1;
-                    end if;
-                    -- step counter
-                    if step_cnt = 1 then
-                        active <= '0';
-                    end if;
-                    step_cnt <= step_cnt - 1;
-                else
-                    tick_cnt <= tick_cnt + 1;
-                end if;
+            if en = '1' then
+                dir_reg <= dir;
             end if;
         end if;
     end process;
-end rtl;
+
+    -- Durum geçiş mantığı
+    process(present_state, dir_reg, en)
+    begin
+        case present_state is
+            when sig4 =>
+                if en = '1' then
+                    if dir_reg = '0' then  -- Negatif yön (ters sıra)
+                        next_state <= sig3;
+                    else                  -- Pozitif yön (normal sıra)
+                        next_state <= sig1;
+                    end if;
+                else
+                    next_state <= sig0;
+                end if;
+                
+            when sig3 =>
+                if en = '1' then
+                    if dir_reg = '0' then
+                        next_state <= sig2;
+                    else
+                        next_state <= sig4;
+                    end if;
+                else
+                    next_state <= sig0;
+                end if;
+                
+            when sig2 =>
+                if en = '1' then
+                    if dir_reg = '0' then
+                        next_state <= sig1;
+                    else
+                        next_state <= sig3;
+                    end if;
+                else
+                    next_state <= sig0;
+                end if;
+                
+            when sig1 =>
+                if en = '1' then
+                    if dir_reg = '0' then
+                        next_state <= sig4;
+                    else
+                        next_state <= sig2;
+                    end if;
+                else
+                    next_state <= sig0;
+                end if;
+                
+            when sig0 =>
+                if en = '1' then
+                    next_state <= sig1;
+                else
+                    next_state <= sig0;
+                end if;
+                
+            when others =>
+                next_state <= sig0;
+        end case;
+    end process;
+
+    -- Durum register'ı
+    process(clk, rst)
+    begin
+        if rst = '1' then
+            present_state <= sig0;
+        elsif rising_edge(clk) then
+            present_state <= next_state;
+        end if;
+    end process;
+
+    -- Çıkış mantığı
+    process(clk)
+    begin
+        if rising_edge(clk) then
+            case present_state is
+                when sig4 => o_signal <= "1000";
+                when sig3 => o_signal <= "0100";
+                when sig2 => o_signal <= "0010";
+                when sig1 => o_signal <= "0001";
+                when others => o_signal <= "0000";
+            end case;
+        end if;
+    end process;
+
+end Behavioral;
