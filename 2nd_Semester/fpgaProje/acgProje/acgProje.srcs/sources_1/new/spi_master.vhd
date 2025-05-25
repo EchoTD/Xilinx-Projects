@@ -23,13 +23,9 @@ Port (
 end spi_master;
  
 architecture Behavioral of spi_master is
- 
---------------------------------------------------------------------------------
--- CONSTANTS
+
 constant c_edgecntrlimdiv2	: integer := c_clkfreq/(c_sclkfreq*2);
- 
---------------------------------------------------------------------------------
--- INTERNAL SIGNALS
+
 signal write_reg	: std_logic_vector (7 downto 0) 	:= (others => '0');	
 signal read_reg		: std_logic_vector (7 downto 0) 	:= (others => '0');	
  
@@ -47,22 +43,14 @@ signal once         : std_logic := '0';
 signal edgecntr		: integer range 0 to c_edgecntrlimdiv2 := 0;
  
 signal cntr 		: integer range 0 to 15 := 0;
- 
---------------------------------------------------------------------------------
--- STATE DEFINITIONS
+
 type states is (S_IDLE, S_TRANSFER);
 signal state : states := S_IDLE;
- 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
+
 begin
  
 pol_phase <= c_cpol & c_cpha;
- 
---------------------------------------------------------------------------------
---    SAMPLE_EN process assigns mosi_en and miso_en internal signals to sclk_fall or sclk_rise in a combinational logic according to 
--- generic parameters of c_cpol and c_cpha via pol_phase signal.
+
 P_SAMPLE_EN : process (pol_phase, sclk_fall, sclk_rise) begin
  
 	case pol_phase is
@@ -93,8 +81,6 @@ P_SAMPLE_EN : process (pol_phase, sclk_fall, sclk_rise) begin
  
 end process P_SAMPLE_EN;
  
---------------------------------------------------------------------------------
---    RISEFALL_DETECT process assigns sclk_rise and sclk_fall signals in a combinational logic.
 P_RISEFALL_DETECT : process (sclk, sclk_prev) begin
  
 	if (sclk = '1' and sclk_prev = '0') then
@@ -110,12 +96,7 @@ P_RISEFALL_DETECT : process (sclk, sclk_prev) begin
 	end if;	
  
 end process P_RISEFALL_DETECT;
- 
---------------------------------------------------------------------------------
---    In the MAIN process S_IDLE and S_TRANSFER states are implemented. state changes from S_IDLE to S_TRANSFER when en_i input
--- signal has the logic high value. At that cycle, write_reg signal is assigned to mosi_data_i input signal. According to c_cpha generic 
--- parameter, the transaction operation changes slightly. This operational difference is well explained in the paper that can be found
--- in Documents folder of the SPI, which is located in SVN server.
+
 P_MAIN : process (clk_i) begin
 if (rising_edge(clk_i)) then
  
@@ -123,8 +104,6 @@ if (rising_edge(clk_i)) then
 	sclk_prev	<= sclk;
  
 	case state is
- 
---------------------------------------------------------------------------------	
 		when S_IDLE =>	
  
 			cs_o			<= '1';
@@ -146,8 +125,7 @@ if (rising_edge(clk_i)) then
 				mosi_o		<= mosi_data_i(7);
 				read_reg	<= x"00";
 			end if;
- 
---------------------------------------------------------------------------------			
+			
 		when S_TRANSFER =>		
  
 			cs_o	<= '0';
@@ -252,9 +230,7 @@ if (rising_edge(clk_i)) then
  
 end if;
 end process P_MAIN;
- 
---------------------------------------------------------------------------------
---    In the SCLK_GEN process, internal sclk signal is generated if sclk_en signal is '1'. 
+
 P_SCLK_GEN : process (clk_i) begin
 if (rising_edge(clk_i)) then
  

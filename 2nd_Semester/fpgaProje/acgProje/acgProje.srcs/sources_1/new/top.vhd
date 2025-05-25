@@ -1,197 +1,157 @@
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
+--  top.vhd  -  minimal top (no seven-segment, no LEDs)
+--  Vivado 2022.2 • Nexys-A7-100T • 100 MHz system clock
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
-entity seg_led_driver is
-    port(
-        seg_in : in  std_logic_vector(6 downto 0);  -- Yedi segment sürücü çıkışı
-        leds   : out std_logic_vector(6 downto 0)   -- Aynı veriyi gösterecek LED'ler
-    );
-end seg_led_driver;
-
-architecture Behavioral of seg_led_driver is
-begin
-    -- Gelen segment kodunu doğrudan LED'lere ata
-    leds <= seg_in;
-end Behavioral;
-
-
--- main_top.vhd: Güncellenmiş top modül
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.numeric_std.all;
-
-entity main_top is
+entity top is
     generic (
-        c_clkfreq  : integer := 100_000_000;
-        c_sclkfreq : integer := 1_000_000;
-        c_cpol     : std_logic := '0';
-        c_cpha     : std_logic := '0';
-        c_readfreq : integer := 2
+        g_clkfreq : integer := 100_000_000      -- on-board 100 MHz
     );
     port (
-        clk       : in  std_logic;
-        miso_i    : in  std_logic;
-        mosi_o    : out std_logic;
-        sclk_o    : out std_logic;
-        cs_o      : out std_logic;
-        seg_out   : out std_logic_vector(6 downto 0);
-        leds      : out std_logic_vector(6 downto 0);  -- Yeni LED çıkış portu
-        an        : out std_logic_vector(3 downto 0);
-        sw        : in  std_logic_vector(2 downto 0)
+        CLK100MHZ       : in  std_logic;
+        JA              : inout std_logic_vector(10 downto 1);
+        JD              : out   std_logic_vector(4 downto 1);
+        SW              : in  std_logic_vector(5 downto 0);
+        BTNC, BTNU, BTND: in  std_logic;
+        UART_RXD_OUT    : out std_logic
     );
-end main_top;
+end top;
 
-architecture Behavioral of main_top is
+architecture rtl of top is
+    signal spi_miso   : std_logic;
+    signal spi_mosi   : std_logic;
+    signal spi_sclk   : std_logic;
+    signal spi_cs     : std_logic;
 
-    -- Alt modül deklarasyonları
-    component acc_reader is
-        generic (
-            c_clkfreq  : integer := 100_000_000;
-            c_sclkfreq : integer := 1_000_000;
-            c_readfreq : integer := 100;
-            c_cpol     : std_logic := '0';
-            c_cpha     : std_logic := '0'
-        );
-        port (
-            clk_i   : in  std_logic;
-            miso_i  : in  std_logic;
-            mosi_o  : out std_logic;
-            sclk_o  : out std_logic;
-            cs_o    : out std_logic;
-            ax_o    : out std_logic_vector(15 downto 0);
-            ay_o    : out std_logic_vector(15 downto 0);
-            az_o    : out std_logic_vector(15 downto 0);
-            ready_o : out std_logic
-        );
-    end component;
+    signal ax, ay, az : std_logic_vector(15 downto 0);
+    signal acc_ready  : std_logic;
 
-    component sevensegmentdecoder is
-        port (
-            bin_in  : in  std_logic_vector(3 downto 0);
-            seg_out : out std_logic_vector(6 downto 0)
-        );
-    end component;
 
-    component seg_led_driver is
-        port(
-            seg_in : in  std_logic_vector(6 downto 0);
-            leds   : out std_logic_vector(6 downto 0)
-        );
-    end component;
+    signal sm_start   : std_logic;
+    signal sm_dir     : std_logic;
+    signal sm_steps   : unsigned(15 downto 0);
+    signal sm_busy    : std_logic;
 
-    -- İç sinyal tanımlamaları
-    signal ax, ay, az        : std_logic_vector(15 downto 0) := (others => '0');
-    signal ready             : std_logic := '0';
-    type digit_array_type is array (0 to 3) of std_logic_vector(3 downto 0);
-    signal digit_values      : digit_array_type := (others => (others => '0'));
-    signal active_digit      : integer range 0 to 3 := 0;
-    signal timer1ms          : integer := 0;
-    signal anodes            : std_logic_vector(3 downto 0) := "1111";
-    signal current_digit     : std_logic_vector(3 downto 0);
-    signal ax_scaled, ay_scaled, az_scaled : std_logic_vector(11 downto 0);
-    signal axis_data         : std_logic_vector(15 downto 0);
-    signal prev_sw           : std_logic_vector(2 downto 0) := "000";
-    signal data_valid        : std_logic := '0';
+    signal btnc_prev  : std_logic := '0';
 
+    signal uart_start : std_logic;
+    signal uart_busy  : std_logic;
+    signal uart_byte  : std_logic_vector(7 downto 0);
+
+    type buf_t is array(0 to 7) of std_logic_vector(7 downto 0);
+    signal tx_buf     : buf_t;
+    signal tx_index   : integer range 0 to 7 := 0;
+    signal tx_active  : std_logic := '0';
+    
 begin
 
-    -- ACC reader instantiation
-    acc_reader_i : acc_reader
+    JA(1) <= 'Z';                       -- MISO line is input only
+    spi_miso <= JA(1);
+
+    JA(2) <= spi_mosi;
+    JA(3) <= spi_sclk;
+    JA(4) <= spi_cs;
+    
+    acc_reader_i : entity work.acc_reader
         generic map (
-            c_clkfreq  => c_clkfreq,
-            c_sclkfreq => c_sclkfreq,
-            c_readfreq => c_readfreq,
-            c_cpol     => c_cpol,
-            c_cpha     => c_cpha
-        )
+            c_clkfreq  => g_clkfreq,
+            c_sclkfreq => 1_000_000,
+            c_readfreq => 100,
+            c_cpol     => '0',
+            c_cpha     => '0')
         port map (
-            clk_i   => clk,
-            miso_i  => miso_i,
-            mosi_o  => mosi_o,
-            sclk_o  => sclk_o,
-            cs_o    => cs_o,
+            clk_i   => CLK100MHZ,
+            miso_i  => spi_miso,
+            mosi_o  => spi_mosi,
+            sclk_o  => spi_sclk,
+            cs_o    => spi_cs,
             ax_o    => ax,
             ay_o    => ay,
             az_o    => az,
-            ready_o => ready
-        );
+            ready_o => acc_ready);
 
-    -- Ölçeklendirme: 16-bit veriyi 12-bit'e indir (0-4095 arası)
-    ax_scaled <= ax(15 downto 4);
-    ay_scaled <= ay(15 downto 4);
-    az_scaled <= az(15 downto 4);
-
-    -- Veri güncelleme ve seçim
-    process(clk)
+    process(CLK100MHZ)  -- one-clock pulse on btnc_rise
+        variable btnc_rise : std_logic;
     begin
-        if rising_edge(clk) then
-            if ready = '1' then
-                data_valid <= '1';
-                case sw is
-                    when "001" => axis_data <= "0000" & ax_scaled; -- X ekseni
-                    when "010" => axis_data <= "0000" & ay_scaled; -- Y ekseni
-                    when "100" => axis_data <= "0000" & az_scaled; -- Z ekseni
-                    when others => axis_data <= (others => '0');
-                end case;
-            end if;
-            if sw /= prev_sw then
-                prev_sw <= sw;
-                data_valid <= '0';
-            end if;
-        end if;
-    end process;
+        if rising_edge(CLK100MHZ) then
+            btnc_rise := BTNC and not btnc_prev;
+            btnc_prev <= BTNC;
 
-    -- BCD dönüşümü ve 7 segment güncelleme
-    process(clk)
-        variable temp : integer range 0 to 4095;
-        variable hundreds, tens, ones : integer range 0 to 9;
-    begin
-        if rising_edge(clk) then
-            if data_valid = '1' then
-                temp := to_integer(unsigned(axis_data(11 downto 0)));
-                hundreds := temp / 100;
-                tens := (temp mod 100) / 10;
-                ones := temp mod 10;
-
-                digit_values(0) <= std_logic_vector(to_unsigned(ones, 4));
-                digit_values(1) <= std_logic_vector(to_unsigned(tens, 4));
-                digit_values(2) <= std_logic_vector(to_unsigned(hundreds, 4));
-                digit_values(3) <= "0000";
-            end if;
-        end if;
-    end process;
-
-    -- Display refresh timer
-    process(clk)
-    begin
-        if rising_edge(clk) then
-            if timer1ms = c_clkfreq/1000 - 1 then
-                timer1ms <= 0;
-                active_digit <= (active_digit + 1) mod 4;
-                anodes <= "1111";
-                anodes(active_digit) <= '0';
-                current_digit <= digit_values(active_digit);
+            if SW(5) = '0' then
+                -- autopilot  - one burst every fresh sample
+                sm_start <= acc_ready;
+                sm_dir   <= ax(15);
+                if ax(15) = '1' then
+                    sm_steps <= unsigned(-signed(ax(15 downto 2)));
+                else
+                    sm_steps <= unsigned( signed(ax(15 downto 2)));
+                end if;
             else
-                timer1ms <= timer1ms + 1;
+
+                sm_start <= btnc_rise;
+                sm_dir   <= BTNU;               -- CW if BTNU, CCW if BTND
+                sm_steps <= ("0000" & unsigned(SW(4 downto 0))); --  0-31 steps
             end if;
         end if;
     end process;
 
-    -- 7-segment decoder instantiation
-    sevenseg_inst : sevensegmentdecoder
+    step_motor_i : entity work.step_motor
+        generic map (
+            c_clkfreq => g_clkfreq)
         port map (
-            bin_in  => current_digit,
-            seg_out => seg_out
-        );
+            clk      => CLK100MHZ,
+            start_i  => sm_start,
+            dir_i    => sm_dir,
+            steps_i  => sm_steps,
+            busy_o   => sm_busy,
+            coils_o  => JD(4 downto 1));
 
-    -- LED driver instantiation: seg_out'u LED'lere yansıt
-    seg_led_driver_i : seg_led_driver
+    process(CLK100MHZ)
+    begin
+        if rising_edge(CLK100MHZ) then
+            -- launch a fresh frame
+            if (acc_ready = '1') and (tx_active = '0') then
+                tx_buf(0) <= x"41";            -- 'A'
+                tx_buf(1) <= ax(15 downto 8);
+                tx_buf(2) <= ax(7 downto 0);
+                tx_buf(3) <= ay(15 downto 8);
+                tx_buf(4) <= ay(7 downto 0);
+                tx_buf(5) <= az(15 downto 8);
+                tx_buf(6) <= az(7 downto 0);
+                tx_buf(7) <= x"0A";            -- LF
+                tx_index  <= 0;
+                tx_active <= '1';
+            end if;
+
+            -- feed the UART whenever it is idle
+            if (tx_active = '1') and (uart_busy = '0') then
+                uart_byte  <= tx_buf(tx_index);
+                uart_start <= '1';
+            else
+                uart_start <= '0';
+            end if;
+
+            -- advance pointer once start pulse has been accepted
+            if uart_start = '1' then
+                if tx_index = 7 then
+                    tx_active <= '0';
+                else
+                    tx_index  <= tx_index + 1;
+                end if;
+            end if;
+        end if;
+    end process;
+
+    -- UART transmitter (8-N-1, 115 200 baud)
+    uart_tx_i : entity work.uart_tx
+        generic map (
+            c_clkfreq => g_clkfreq,
+            c_baud    => 115200)
         port map (
-            seg_in => seg_out,
-            leds   => leds
-        );
-
-    -- Anot sinyalleri
-    an <= anodes;
-
-end Behavioral;
+            clk      => CLK100MHZ,
+            tx_start => uart_start,
+            tx_data  => uart_byte,
+            tx_busy  => uart_busy,
+            txd_o    => UART_RXD_OUT);
+end rtl;
