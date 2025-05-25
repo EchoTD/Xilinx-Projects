@@ -12,12 +12,11 @@ entity top is
         ACL_MOSI      : out std_logic;
         ACL_SCLK      : out std_logic;
         ACL_CSN       : out std_logic;
-        -- stepper coils  JD[4:1]
-        JD            : out std_logic_vector(4 downto 1);
+        -- stepper coils  JA[4:1]
+        JA            : out std_logic_vector(4 downto 1);
         -- user I/O
         SW            : in  std_logic_vector(5 downto 0);
-        BTNC, BTNU,
-        BTND          : in  std_logic;
+        BTNC, BTNU, BTND : in  std_logic;
         -- UART TX → PC
         UART_RXD_OUT  : out std_logic
     );
@@ -74,13 +73,13 @@ begin
 
     -------------------------------------------------------------------------
     -- stepper driver
-    stepdrv : entity work.pmod_step_driver
+    stepdrv : entity work.step_motor
         port map (
-            rst    => '0',
-            dir    => motor_dir,
-            clk    => CLK100MHZ,
-            en     => motor_en,
-            signal => JD(4 downto 1));
+            rst      => '0',
+            dir      => motor_dir,
+            clk      => CLK100MHZ,
+            en_step  => motor_en,
+            o_signal => JA(4 downto 1));
 
     -------------------------------------------------------------------------
     -- simple UART: A + raw XYZ + LF (8 bytes)
