@@ -1,0 +1,4 @@
+Time resolution is 1 ps
+Failure: SIM DONE
+Time: 19215 ns  Iteration: 0  Process: /tb_spi_master/stim_proc  File: /home/acg/Desktop/Xilinx Projects/2nd_Semester/homework_2/homework_2.srcs/sim_1/new/tb_spi_master.vhd
+$finish called at time : 19215 ns : File "/home/acg/Desktop/Xilinx Projects/2nd_Semester/homework_2/homework_2.srcs/sim_1/new/tb_spi_master.vhd" Line 141

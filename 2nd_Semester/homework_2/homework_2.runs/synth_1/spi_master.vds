@@ -1,0 +1,47 @@
+#-----------------------------------------------------------
+# Vivado v2022.2 (64-bit)
+# SW Build 3671981 on Fri Oct 14 04:59:54 MDT 2022
+# IP Build 3669848 on Fri Oct 14 08:30:02 MDT 2022
+# Start of session at: Tue May 13 21:49:59 2025
+# Process ID: 16214
+# Current directory: /home/acg/Desktop/Xilinx Projects/2nd_Semester/homework_2/homework_2.runs/synth_1
+# Command line: vivado -log spi_master.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source spi_master.tcl
+# Log file: /home/acg/Desktop/Xilinx Projects/2nd_Semester/homework_2/homework_2.runs/synth_1/spi_master.vds
+# Journal file: /home/acg/Desktop/Xilinx Projects/2nd_Semester/homework_2/homework_2.runs/synth_1/vivado.jou
+# Running On: echo-x250, OS: Linux, CPU Frequency: 2532.873 MHz, CPU Physical cores: 2, Host memory: 8194 MB
+#-----------------------------------------------------------
+source spi_master.tcl -notrace
+create_project: Time (s): cpu = 00:00:08 ; elapsed = 00:00:09 . Memory (MB): peak = 1313.961 ; gain = 0.023 ; free physical = 278 ; free virtual = 12827
+Command: read_checkpoint -auto_incremental -incremental {/home/acg/Desktop/Xilinx Projects/2nd_Semester/homework_2/homework_2.srcs/utils_1/imports/synth_1/top.dcp}
+INFO: [Vivado 12-5825] Read reference checkpoint from /home/acg/Desktop/Xilinx Projects/2nd_Semester/homework_2/homework_2.srcs/utils_1/imports/synth_1/top.dcp for incremental synthesis
+INFO: [Vivado 12-7989] Please ensure there are no constraint changes
+Command: synth_design -top spi_master -part xc7a100tcsg324-2
+Starting synth_design
+Attempting to get a license for feature 'Synthesis' and/or device 'xc7a100t'
+INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7a100t'
+INFO: [Vivado_Tcl 4-1810] synth_design options have changed between reference and incremental; A full resynthesis will be run
+INFO: [Device 21-403] Loading part xc7a100tcsg324-2
+INFO: [Synth 8-7079] Multithreading enabled for synth_design using a maximum of 4 processes.
+INFO: [Synth 8-7078] Launching helper process for spawning children vivado processes
+INFO: [Synth 8-7075] Helper process launched with PID 16268
+INFO: [Synth 8-11241] undeclared symbol 'REGCCE', assumed default net type 'wire' [/home/acg/Vivado/Vivado/2022.2/data/verilog/src/unimacro/BRAM_SINGLE_MACRO.v:2170]
+---------------------------------------------------------------------------------
+Starting RTL Elaboration : Time (s): cpu = 00:00:06 ; elapsed = 00:00:06 . Memory (MB): peak = 1948.020 ; gain = 372.770 ; free physical = 173 ; free virtual = 12036
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1496.018; parent = 1233.736; children = 262.281
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 2943.715; parent = 1948.023; children = 995.691
+---------------------------------------------------------------------------------
+ERROR: [Synth 8-2757] this construct is only supported in VHDL 1076-2008 [/home/acg/Desktop/Xilinx Projects/2nd_Semester/homework_2/homework_2.srcs/sources_1/new/spi_master.vhd:78]
+ERROR: [Synth 8-2757] this construct is only supported in VHDL 1076-2008 [/home/acg/Desktop/Xilinx Projects/2nd_Semester/homework_2/homework_2.srcs/sources_1/new/spi_master.vhd:79]
+INFO: [Synth 8-11252] unit 'rtl' is ignored due to previous errors [/home/acg/Desktop/Xilinx Projects/2nd_Semester/homework_2/homework_2.srcs/sources_1/new/spi_master.vhd:235]
+INFO: [Synth 8-10443] VHDL file '/home/acg/Desktop/Xilinx Projects/2nd_Semester/homework_2/homework_2.srcs/sources_1/new/spi_master.vhd' is ignored due to errors
+---------------------------------------------------------------------------------
+Finished RTL Elaboration : Time (s): cpu = 00:00:07 ; elapsed = 00:00:08 . Memory (MB): peak = 2010.988 ; gain = 435.738 ; free physical = 186 ; free virtual = 11943
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1584.822; parent = 1323.542; children = 262.281
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3006.684; parent = 2010.992; children = 995.691
+---------------------------------------------------------------------------------
+RTL Elaboration failed
+INFO: [Common 17-83] Releasing license: Synthesis
+12 Infos, 0 Warnings, 0 Critical Warnings and 3 Errors encountered.
+synth_design failed
+ERROR: [Common 17-69] Command failed: Synthesis failed - please see the console or run log file for details
+INFO: [Common 17-206] Exiting Vivado at Tue May 13 21:50:28 2025...

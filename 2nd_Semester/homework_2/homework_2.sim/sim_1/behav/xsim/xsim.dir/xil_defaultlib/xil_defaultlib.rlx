@@ -1,0 +1,10 @@
+0.7
+2020.2
+Oct 14 2022
+05:07:14
+/home/acg/Desktop/Xilinx Projects/2nd_Semester/homework_2/homework_2.srcs/sim_1/new/tb_main_top.vhd,1747160496,vhdl,,,,tb_main_top,,,,,,,,
+/home/acg/Desktop/Xilinx Projects/2nd_Semester/homework_2/homework_2.srcs/sim_1/new/tb_spi_master.vhd,1747164235,vhdl,,,,tb_spi_master,,,,,,,,
+/home/acg/Desktop/Xilinx Projects/2nd_Semester/homework_2/homework_2.srcs/sources_1/new/acc_reader.vhd,1747159926,vhdl,,,,acc_reader,,,,,,,,
+/home/acg/Desktop/Xilinx Projects/2nd_Semester/homework_2/homework_2.srcs/sources_1/new/seg_led_driver.vhd,1747160284,vhdl,/home/acg/Desktop/Xilinx Projects/2nd_Semester/homework_2/homework_2.srcs/sim_1/new/tb_main_top.vhd,,,main_top;seg_led_driver,,,,,,,,
+/home/acg/Desktop/Xilinx Projects/2nd_Semester/homework_2/homework_2.srcs/sources_1/new/sevensegmentdecoder.vhd,1747159903,vhdl,,,,sevensegmentdecoder,,,,,,,,
+/home/acg/Desktop/Xilinx Projects/2nd_Semester/homework_2/homework_2.srcs/sources_1/new/spi_master.vhd,1747164282,vhdl,,,,spi_master,,,,,,,,
