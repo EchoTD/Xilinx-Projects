@@ -4,11 +4,11 @@ use ieee.numeric_std.all;
 
 entity step_motor is
     port (
-        clk      : in  std_logic;                     -- any clock
-        rst      : in  std_logic;                     -- async reset, active 1
-        en_step  : in  std_logic;                     -- one pulse = one step
-        dir      : in  std_logic;                     -- 1 = CW, 0 = CCW
-        o_signal : out std_logic_vector(3 downto 0)   -- coils → JD4..JD1
+        clk      : in  std_logic;                     
+        rst      : in  std_logic;                     
+        en_step  : in  std_logic;                     
+        dir      : in  std_logic;                     
+        o_signal : out std_logic_vector(3 downto 0)   
     );
 end step_motor;
 

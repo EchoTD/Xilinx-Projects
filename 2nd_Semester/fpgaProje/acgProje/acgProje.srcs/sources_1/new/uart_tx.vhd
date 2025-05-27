@@ -19,7 +19,7 @@ end uart_tx;
 architecture rtl of uart_tx is
     constant c_div : integer := c_clkfreq / c_baud;
     signal div_cnt : integer range 0 to c_div-1 := 0;
-    signal shreg   : std_logic_vector(9 downto 0) := (others=>'1'); -- idle='1'
+    signal shreg   : std_logic_vector(9 downto 0) := (others=>'1');
     signal bit_cnt : integer range 0 to 10 := 10;
 begin
     txd_o  <= shreg(0);

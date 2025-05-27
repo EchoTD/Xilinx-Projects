@@ -104,6 +104,8 @@ read_xdc {{/home/acg/Desktop/Xilinx Projects/2nd_Semester/fpgaProje/acgProje/acg
 set_property used_in_implementation false [get_files {{/home/acg/Desktop/Xilinx Projects/2nd_Semester/fpgaProje/acgProje/acgProje.srcs/constrs_1/imports/new/Nexys-A7-100T-Master.xdc}}]
 
 set_param ips.enableIPCacheLiteLoad 1
+
+read_checkpoint -auto_incremental -incremental {/home/acg/Desktop/Xilinx Projects/2nd_Semester/fpgaProje/acgProje/acgProje.srcs/utils_1/imports/synth_1/top.dcp}
 close [open __synthesis_is_running__ w]
 
 OPTRACE "synth_design" START { }
